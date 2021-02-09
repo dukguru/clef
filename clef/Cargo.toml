@@ -1,0 +1,11 @@
+[package]
+name = "clef"
+version = "0.0.0"
+authors = ["Deokseok Choi <dukguru@gmail.com>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "Music algorithm and data structure"
+repository = "https://github.com/dukguru/clef"
+keywords = ["clef", "music"]
+categories = ["music"]
+readme = "README.md"
