@@ -7,5 +7,5 @@ license = "MIT OR Apache-2.0"
 description = "Music algorithm and data structure"
 repository = "https://github.com/dukguru/clef"
 keywords = ["clef", "music"]
-categories = ["music"]
+categories = ["multimedia::audio"]
 readme = "README.md"
