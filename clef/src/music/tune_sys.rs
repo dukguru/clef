@@ -8,21 +8,21 @@ pub trait TuningSystem {
     fn to_pitch(&self, hertz: f32) -> Pitch;
 }
 
-pub struct TwelveToneEqualTemperament {
+pub struct EqualTemperament {
     a4_hertz: f32,
 }
 
-impl TwelveToneEqualTemperament {
+impl EqualTemperament {
     const TWELFTH_ROOT_OF_TWO: f32 = 1.05946309435929526456182;
     const LN_TWELFTH_ROOT_OF_TWO: f32 = 0.05776226504666210911809767902434;
 
-    pub fn new(a4_hertz: f32) -> TwelveToneEqualTemperament {
-        TwelveToneEqualTemperament { a4_hertz }
+    pub fn new(a4_hertz: f32) -> EqualTemperament {
+        EqualTemperament { a4_hertz }
     }
 }
 
 #[contract_trait]
-impl TuningSystem for TwelveToneEqualTemperament {
+impl TuningSystem for EqualTemperament {
     fn to_hertz(&self, pitch: &Pitch) -> f32 {
         let intervals: i32 = *pitch - A4;
         self.a4_hertz * Self::TWELFTH_ROOT_OF_TWO.powi(intervals)
@@ -87,23 +87,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ttet_to_hertz_test() {
-        let ttet = TwelveToneEqualTemperament::new(440.0);
-        assert_eq!(440.0, ttet.to_hertz(&A4));
-        assert_eq!(523.2512, ttet.to_hertz(&C5));
-        assert_eq!(830.6098, ttet.to_hertz(&Gs5));
-        assert_eq!(233.08176, ttet.to_hertz(&Bb3));
-        assert_eq!(219.99988, ttet.to_hertz(&A3));
+    fn et_to_hertz_test() {
+        let et = EqualTemperament::new(440.0);
+        assert_eq!(440.0, et.to_hertz(&A4));
+        assert_eq!(523.2512, et.to_hertz(&C5));
+        assert_eq!(830.6098, et.to_hertz(&Gs5));
+        assert_eq!(233.08176, et.to_hertz(&Bb3));
+        assert_eq!(219.99988, et.to_hertz(&A3));
     }
 
     #[test]
-    fn ttet_to_pitch_test() {
-        let ttet = TwelveToneEqualTemperament::new(440.0);
-        assert_eq!(A4, ttet.to_pitch(440.0));
-        assert_eq!(C5, ttet.to_pitch(523.2512));
-        assert_eq!(Gs5, ttet.to_pitch(830.6));
-        assert_eq!(Ab5, ttet.to_pitch(830.7));
-        assert_eq!(A3, ttet.to_pitch(219.99988));
-        assert_eq!(Fs4, ttet.to_pitch(369.9));
+    fn et_to_pitch_test() {
+        let et = EqualTemperament::new(440.0);
+        assert_eq!(A4, et.to_pitch(440.0));
+        assert_eq!(C5, et.to_pitch(523.2512));
+        assert_eq!(Gs5, et.to_pitch(830.6));
+        assert_eq!(Ab5, et.to_pitch(830.7));
+        assert_eq!(A3, et.to_pitch(219.99988));
+        assert_eq!(Fs4, et.to_pitch(369.9));
     }
 }
