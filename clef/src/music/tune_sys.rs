@@ -1,10 +1,11 @@
 use super::*;
-use contracts::{contract_trait, ensures};
+use contracts::{contract_trait, ensures, requires};
 
 #[contract_trait]
 pub trait TuningSystem {
     #[ensures(ret > 0f32)]
     fn to_hertz(&self, pitch: &Pitch) -> f32;
+    #[requires(hertz > 0f32)]
     fn to_pitch(&self, hertz: f32) -> Pitch;
 }
 
@@ -31,7 +32,7 @@ impl TuningSystem for EqualTemperament {
     fn to_pitch(&self, hertz: f32) -> Pitch {
         let intervals = (hertz / self.a4_hertz).ln() / Self::LN_TWELFTH_ROOT_OF_TWO;
         let intervals_rounded = intervals.round();
-        
+
         let accidental = match intervals - intervals_rounded {
             d if d > 0.0 => FLAT,
             _ => SHARP,
