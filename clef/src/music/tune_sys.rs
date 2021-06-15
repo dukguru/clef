@@ -17,8 +17,8 @@ impl EqualTemperament {
     const TWELFTH_ROOT_OF_TWO: f32 = 1.05946309435929526456182;
     const LN_TWELFTH_ROOT_OF_TWO: f32 = 0.05776226504666210911809767902434;
 
-    pub fn new(a4_hertz: f32) -> EqualTemperament {
-        EqualTemperament { a4_hertz }
+    pub fn new(a4_hertz: f32) -> Self {
+        Self { a4_hertz }
     }
 }
 
@@ -83,6 +83,59 @@ impl TuningSystem for EqualTemperament {
     }
 }
 
+pub struct JustIntonation<'a> {
+    ref_pitch: Pitch,
+    ref_hertz: f32,
+    ratio: &'a [f32; 12],
+}
+
+impl<'a> JustIntonation<'a> {
+    const standard_ratio: [f32; 12] = [
+        1.0,
+        25.0 / 24.0,
+        9.0 / 8.0,
+        6.0 / 5.0,
+        5.0 / 4.0,
+        4.0 / 3.0,
+        45.0 / 32.0,
+        3.0 / 2.0,
+        8.0 / 5.0,
+        5.0 / 3.0,
+        9.0 / 5.0,
+        15.0 / 8.0,
+    ];
+}
+
+impl<'a> JustIntonation<'a> {
+    pub fn new(ref_pitch: Pitch, ref_hertz: f32) -> JustIntonation<'a> {
+        Self {
+            ref_pitch,
+            ref_hertz,
+            ratio: &Self::standard_ratio,
+        }
+    }
+}
+
+#[contract_trait]
+impl<'a> TuningSystem for JustIntonation<'a> {
+    fn to_hertz(&self, pitch: &Pitch) -> f32 {
+        let intervals: i32 = *pitch - self.ref_pitch;
+        let mut octave = intervals / 12;
+        let mut tone = intervals % 12;
+        
+        if tone < 0 {
+            tone += 12;
+            octave -= 1;
+        }
+        
+        self.ref_hertz * self.ratio[tone as usize] * 2.0f32.powi(octave)
+    }
+
+    fn to_pitch(&self, _hertz: f32) -> Pitch {
+        C4
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -106,5 +159,16 @@ mod tests {
         assert_eq!(Ab5, et.to_pitch(830.7));
         assert_eq!(A3, et.to_pitch(219.99988));
         assert_eq!(Fs4, et.to_pitch(369.9));
+    }
+
+    #[test]
+    fn just_to_hertz_test() {
+        let just = JustIntonation::new(C4, 261.63);
+        assert_eq!(418.608 * 0.25, just.to_hertz(&Ab2));
+        assert_eq!(418.608 * 0.5, just.to_hertz(&Ab3));
+        assert_eq!(436.05, just.to_hertz(&A4));
+        assert_eq!(418.608, just.to_hertz(&Ab4));
+        assert_eq!(523.26, just.to_hertz(&C5));
+        assert_eq!(418.608 * 2.0, just.to_hertz(&Ab5));
     }
 }
